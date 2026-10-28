@@ -300,3 +300,12 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 .logo.big i{width:20px;height:20px;border-radius:4px}
 .onb-line{margin:0;font-size:17px;font-weight:600;line-height:1.45;word-break:keep-all}
 .onb-bot{display:flex;flex-direction:column;gap:12px}
+
+/* Checklist carousel */
+.tcar{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;gap:0}
+.tcar::-webkit-scrollbar{display:none}
+.tcar>.slide{flex:0 0 100%;scroll-snap-align:start;min-width:0;padding:3px}
+.tdots{display:flex;justify-content:center;gap:6px}
+.tdots button{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line)}
+.tdots button.on{background:var(--accent)}
+.sec .tpos{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
