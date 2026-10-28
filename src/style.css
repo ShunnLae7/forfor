@@ -25,7 +25,8 @@
   --warn:#E7A64B; --warn-soft:#33260F; --danger:#F08A80; --danger-soft:#3A1A18; --ok:#5CC796; --ok-soft:#12301F;
   --device:#050407; color-scheme:dark}
 
-*{box-sizing:border-box}
+*{box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{display:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
 button,input,select,textarea{font:inherit;color:inherit}
