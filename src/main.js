@@ -29,7 +29,7 @@ const S = {
  loginStep:'school', genStep:0,
  profile:{...PERSONAS.cont.p}, ans:{...PERSONAS.cont.ans}, persona:'cont', diagI:0,
  pref:{max:18,noNine:false,freeFri:false,eng:false}, alt:false, ttView:'plan', reg:{}, billCourse:'ds', qaView:'chat', pcat:'all', openTr:{}, openAns:{}, liked:{},
- chat:[], points:120, myPosts:[], showAI:false, showMoney:false, step:1
+ taskI:0, chat:[], points:120, myPosts:[], showAI:false, showMoney:false, step:1
 };
 
 /* ======================= HELPERS ======================= */
@@ -128,6 +128,7 @@ function renderMain(){
  if (DEMO && S.mode === 'admin') { m.innerHTML = dashboard(); return; }
  m.innerHTML = `<div class="device-wrap"><div class="device"><div class="screen" id="screen">${screen()}</div></div></div>`;
  const ms = document.querySelector('.msgs'); if (ms) ms.scrollTop = ms.scrollHeight;
+ const tc = document.getElementById('tcar'); if (tc) tc.scrollLeft = S.taskI * tc.clientWidth;
 }
 
 function screen(){
@@ -198,6 +199,23 @@ function taskCard(id){
   ${n!=null?`<span class="dd ${ddClass(n)}">${ddLabel(n)}</span>`:'<span></span>'}</div></div>`;
 }
 
+/* 체크리스트 가로 캐러셀: CSS scroll-snap, 위치는 S.taskI에 저장해 render 뒤 복원 */
+function taskCarousel(tasks){
+ const cards = tasks.map(taskCard).filter(Boolean), n = cards.length;
+ S.taskI = Math.min(S.taskI, Math.max(0, n - 1));
+ return `<div class="sec"><h2>${t('week')}</h2>${n>1?`<span class="tpos" id="tpos">${S.taskI+1} / ${n}</span>`:''}</div>
+  <div class="tcar" id="tcar">${cards.map(c=>`<div class="slide">${c}</div>`).join('')}</div>
+  ${n>1?`<div class="tdots" id="tdots">${cards.map((_,i)=>`<button class="${i===S.taskI?'on':''}" data-act="taskDot" data-v="${i}" aria-label="${i+1} / ${n}"></button>`).join('')}</div>`:''}`;
+}
+function taskScrolled(el){
+ const i = Math.round(el.scrollLeft / (el.clientWidth || 1)), n = el.children.length;
+ if (i === S.taskI || i < 0 || i >= n) return;
+ S.taskI = i;
+ const pos = document.getElementById('tpos'); if (pos) pos.textContent = `${i+1} / ${n}`;
+ document.querySelectorAll('#tdots button').forEach((d,j) => d.classList.toggle('on', j === i));
+}
+document.addEventListener('scroll', e => { if (e.target.id === 'tcar') taskScrolled(e.target); }, true);
+
 function home(){
  const ph = PHASES[S.phase];
  if (!S.loggedIn) {
@@ -222,8 +240,7 @@ function home(){
      <span class="src">${S.profile.year} 요람 · 컴퓨터공학과 교육과정 p.142 (예시)</span></div></div>`;
  return `<div ${spot('시기 × 학번 맞춤 생성')}><div class="banner"><span class="eyebrow">${t('phases')[S.phase]} · ${md(ph.date)}</span>
    <b>${tx(ph.inn(due))}</b><span class="s">${t('hi')(esc(S.profile.name))} · ${tx(DEPTS[S.profile.dept])} ${grade()}${S.lang==='ko'?'학년':''}</span></div></div>
-  <div class="sec"><h2>${t('week')}</h2></div>
-  ${tasks.map(taskCard).join('')}
+  ${taskCarousel(tasks)}
   <div class="sec"><h2>${t('remain')}</h2><button data-act="tab" data-v="study">${t('all')}</button></div>
   ${reqBlock}
   <div class="sec"><h2>${t('cal')}</h2></div>${calendar()}`;
@@ -575,6 +592,7 @@ document.addEventListener('click', e => {
  const a = b.dataset.act, v = b.dataset.v;
  if (['mode','auth','phase','step','persona'].includes(a)) S.onboard = false;
  if (a==='onbStart'){ S.onboard = false; render(); }
+ else if (a==='taskDot'){ const tc = document.getElementById('tcar'); if (tc) tc.scrollTo({left: +v * tc.clientWidth, behavior:'smooth'}); }
  else if (a==='mode'){ S.mode=v; render(); }
  else if (a==='auth'){ S.loggedIn = v==='in'; S.overlay=null; render(); }
  else if (a==='phase'){ S.phase=v; render(); }
@@ -642,3 +660,5 @@ document.addEventListener('input', e => {
 });
 
 render();
+
+
