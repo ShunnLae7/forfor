@@ -128,7 +128,10 @@ function renderMain(){
  if (DEMO && S.mode === 'admin') { m.innerHTML = dashboard(); return; }
  m.innerHTML = `<div class="device-wrap"><div class="device"><div class="screen" id="screen">${screen()}</div></div></div>`;
  const ms = document.querySelector('.msgs'); if (ms) ms.scrollTop = ms.scrollHeight;
- const tc = document.getElementById('tcar'); if (tc) tc.scrollLeft = S.taskI * tc.clientWidth;
+ requestAnimationFrame(() => {
+  const tc = document.getElementById('tcar');
+  if (tc && tc.clientWidth) tc.scrollLeft = S.taskI * tc.clientWidth;
+ });
 }
 
 function screen(){
@@ -202,13 +205,17 @@ function taskCard(id){
 /* 체크리스트 가로 캐러셀: CSS scroll-snap, 위치는 S.taskI에 저장해 render 뒤 복원 */
 function taskCarousel(tasks){
  const cards = tasks.map(taskCard).filter(Boolean), n = cards.length;
+ /* 로그인·학생 유형·시기·언어·카드 수가 바뀌면 첫 카드부터 */
+ const key = [S.loggedIn, S.persona, S.phase, S.lang, n].join('|');
+ if (S.taskKey !== key) { S.taskKey = key; S.taskI = 0; }
  S.taskI = Math.min(S.taskI, Math.max(0, n - 1));
- return `<div class="sec"><h2>${t('week')}</h2>${n>1?`<span class="tpos" id="tpos">${S.taskI+1} / ${n}</span>`:''}</div>
+ return `<div class="twrap"><div class="sec"><h2>${t('week')}</h2>${n>1?`<span class="tpos" id="tpos">${S.taskI+1} / ${n}</span>`:''}</div>
   <div class="tcar" id="tcar">${cards.map(c=>`<div class="slide">${c}</div>`).join('')}</div>
-  ${n>1?`<div class="tdots" id="tdots">${cards.map((_,i)=>`<button class="${i===S.taskI?'on':''}" data-act="taskDot" data-v="${i}" aria-label="${i+1} / ${n}"></button>`).join('')}</div>`:''}`;
+  ${n>1?`<div class="tdots" id="tdots">${cards.map((_,i)=>`<button class="${i===S.taskI?'on':''}" data-act="taskDot" data-v="${i}" aria-label="${i+1} / ${n}"></button>`).join('')}</div>`:''}</div>`;
 }
 function taskScrolled(el){
- const i = Math.round(el.scrollLeft / (el.clientWidth || 1)), n = el.children.length;
+ if (!el.clientWidth) return;
+ const i = Math.round(el.scrollLeft / el.clientWidth), n = el.children.length;
  if (i === S.taskI || i < 0 || i >= n) return;
  S.taskI = i;
  const pos = document.getElementById('tpos'); if (pos) pos.textContent = `${i+1} / ${n}`;
@@ -570,7 +577,7 @@ function runParse(){
  S.loginStep = 'gen'; S.genStep = 0; render();
  const tick = () => { S.genStep++; if (S.overlay==='login') renderMain();
   if (S.genStep < 4) setTimeout(tick, 550);
-  else setTimeout(()=>{ S.loggedIn = true; S.overlay = null; S.tab = 'home'; render(); toast(S.lang==='ko'?'로드맵을 만들었어요':'Your plan is ready'); }, 600); };
+  else setTimeout(()=>{ S.loggedIn = true; S.taskI = 0; S.overlay = null; S.tab = 'home'; render(); toast(S.lang==='ko'?'로드맵을 만들었어요':'Your plan is ready'); }, 600); };
  setTimeout(tick, 450);
 }
 function goStep(k){
@@ -594,7 +601,7 @@ document.addEventListener('click', e => {
  if (a==='onbStart'){ S.onboard = false; render(); }
  else if (a==='taskDot'){ const tc = document.getElementById('tcar'); if (tc) tc.scrollTo({left: +v * tc.clientWidth, behavior:'smooth'}); }
  else if (a==='mode'){ S.mode=v; render(); }
- else if (a==='auth'){ S.loggedIn = v==='in'; S.overlay=null; render(); }
+ else if (a==='auth'){ S.loggedIn = v==='in'; S.taskI = 0; S.overlay=null; render(); }
  else if (a==='phase'){ S.phase=v; render(); }
  else if (a==='step'){ goStep(v); }
  else if (a==='reset'){ Object.assign(S,{onboard:true,mode:'student',loggedIn:false,phase:'arrive',tab:'home',overlay:null,reg:{},chat:[],openTr:{},myPosts:[],points:120,alt:false,ttView:'plan',qaView:'chat',pcat:'all',step:1,persona:'cont',profile:{...PERSONAS.cont.p},ans:{...PERSONAS.cont.ans},pref:{max:18,noNine:false,freeFri:false,eng:false}}); render(); }
