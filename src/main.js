@@ -125,14 +125,13 @@ function renderMain(){
  document.body.classList.toggle('show-ai', S.showAI);
  document.body.classList.toggle('show-money', S.showMoney);
  const m = document.getElementById('main');
- if (S.mode === 'admin') { m.innerHTML = dashboard(); return; }
+ if (DEMO && S.mode === 'admin') { m.innerHTML = dashboard(); return; }
  m.innerHTML = `<div class="device-wrap"><div class="device"><div class="screen" id="screen">${screen()}</div></div></div>`;
  const ms = document.querySelector('.msgs'); if (ms) ms.scrollTop = ms.scrollHeight;
 }
 
 function screen(){
  if (S.onboard) return onboarding();
- const status = `<div class="statusbar"><span>9:41</span><span>${md(PHASES[S.phase].date)} · 5G</span></div>`;
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
   <div class="headr"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select>
   ${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : `<button class="loginpill" data-act="openLogin">${t('login')}</button>`}</div></div>`;
@@ -149,7 +148,7 @@ function screen(){
  else if (S.overlay === 'bill') ov = billOverlay();
  else if (S.overlay === 'compose') ov = composeOverlay();
  else if (S.overlay === 'logout') ov = logoutOverlay();
- return status + head + `<div style="flex:1;min-height:0;display:flex;flex-direction:column">${body}</div>` + bar + ov;
+ return head + `<div style="flex:1;min-height:0;display:flex;flex-direction:column">${body}</div>` + bar + ov;
 }
 
 function lockCard(preview){
@@ -546,7 +545,9 @@ function dashboard(){
 }
 
 /* ======================= RENDER & EVENTS ======================= */
-function render(){ renderRail(); renderMain(); }
+const DEMO = new URLSearchParams(location.search).get('demo') === '1';
+document.body.classList.toggle('demo', DEMO);
+function render(){ if (DEMO) renderRail(); renderMain(); }
 
 function runParse(){
  S.loginStep = 'gen'; S.genStep = 0; render();
