@@ -59,6 +59,8 @@ const ICON = {
  tt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 5v15M15 5v15"/></svg>',
  comm:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15 15c2.3-.4 4.4.8 5.3 3.6"/></svg>',
  qa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5" stroke-linecap="round"/></svg>',
+ close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+ google:'<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>',
  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
 };
 
@@ -167,7 +169,7 @@ function notiOverlay(){
  const cards = S.notis.map(x => `<button class="noti-card${x.unread?' unread':''}" data-act="notiGo" data-v="${esc(x.id)}">
    <span class="noti-top"><span class="noti-ic">${tx(x.ic)}</span><span class="noti-when">${tx(x.when)}</span></span>
    <span class="noti-t">${tx(x.t)}</span><span class="noti-d">${tx(x.d)}</span>${x.unread?'<i class="noti-dot" aria-hidden="true"></i>':''}</button>`).join('');
- return `<div class="overlay" id="notiov" role="dialog" aria-label="${nt('title')}"><div class="ovhead"><b>${nt('title')}</b><button data-act="closeOv">${t('close')}</button></div>
+ return `<div class="overlay" id="notiov" role="dialog" aria-label="${nt('title')}"><div class="ovhead"><b>${nt('title')}</b><button class="ovx" data-act="closeOv" aria-label="${t('close')}">${ICON.close}</button></div>
   <div class="scroll noti-list"><button class="btn line noti-prof" data-act="logoutAsk">${nt('profile')}</button>
   ${S.notis.length ? `<div class="noti-sum"><b>${nt('newN')(n)}</b><button data-act="notiAll" ${n?'':'disabled'}>${nt('readAll')}</button></div>${cards}` : `<div class="noti-empty">${nt('empty')}</div>`}</div></div>`;
 }
@@ -436,7 +438,7 @@ ${c.id==='ds'?'이 과목은 전공 필수이고, 다음 학년의 알고리즘�
 바쁘신 와중에 읽어 주셔서 감사합니다.
 ${p.name} 드림`;
  S._mail = mail;
- return `<div class="overlay"><div class="ovhead"><b>${S.lang==='ko'?'빌넣 모드':'Add-request mode'} · ${esc(cname)}</b><button data-act="closeOv">${t('close')}</button></div>
+ return `<div class="overlay"><div class="ovhead"><b>${S.lang==='ko'?'빌넣 모드':'Add-request mode'} · ${esc(cname)}</b><button class="ovx" data-act="closeOv" aria-label="${t('close')}">${ICON.close}</button></div>
  <div class="scroll" style="padding-top:12px">
   <div class="card stepcard"><span class="no">1</span><div style="display:flex;flex-direction:column;gap:4px">
    <span class="t">${S.lang==='ko'?'지금 신청할 수 있어요':'You can still apply'}</span>
@@ -484,7 +486,7 @@ function community(){
   <span class="s">${S.lang==='ko'?'예시 게시글 · 교수님 이름은 익명 처리':'Example posts · professor names anonymized'}</span>`;
 }
 function composeOverlay(){
- return `<div class="overlay"><div class="ovhead"><b>${t('write')}</b><button data-act="closeOv">${t('close')}</button></div>
+ return `<div class="overlay"><div class="ovhead"><b>${t('write')}</b><button class="ovx" data-act="closeOv" aria-label="${t('close')}">${ICON.close}</button></div>
   <form class="scroll" id="composeForm" style="padding-top:12px">
    <div class="field"><label for="cCat">${S.lang==='ko'?'카테고리':'Category'}</label><select id="cCat">${PCATS.slice(1).map(([k,l])=>`<option value="${k}">${tx(l)}</option>`).join('')}</select></div>
    <div class="field"><label for="cTitle">${S.lang==='ko'?'제목':'Title'}</label><input id="cTitle" required value="${S.lang==='ko'?'이산구조 B교수님 강의평':'Review: Discrete Structures, Prof. B'}"></div>
@@ -534,7 +536,7 @@ function loginOverlay(){
  const st = S.loginStep; const ko = S.lang==='ko';
  let body = '';
  if (st === 'school') body = `<div class="card" style="gap:12px"><span class="t">${ko?'1분이면 시작할 수 있어요':'Start in a minute'}</span>
-   <button class="gbtn" data-act="google"><b>G</b>${ko?'Google 계정으로 계속하기':'Continue with Google'}</button>
+   <button class="gbtn" data-act="google">${ICON.google}${ko?'Google 계정으로 계속하기':'Continue with Google'}</button>
    <button class="gbtn pri" data-act="lstep" data-v="profile">${ko?'학교 이메일로 계속하기':'Continue with school email'}</button>
    <span class="s">${ko?'학교 메일이 아직 없어도 Google 계정으로 가입할 수 있어요. 학번은 다음 단계에서 입력해요.':'No school email yet? Use Google. You enter your student ID next.'}</span>
    <button class="textbtn" data-act="closeOv">${ko?'로그인 없이 둘러보기':'Browse as guest'}</button></div>`;
@@ -587,11 +589,11 @@ function loginOverlay(){
   body = `<div class="card"><span class="t">${ko?'내 체크리스트를 만들고 있어요':'Building your checklist'}</span><ol class="gen">
    ${steps.map((x,i)=>`<li class="${S.genStep>i?'done':''}">${x}</li>`).join('')}</ol></div>`;
  }
- return `<div class="overlay loginov"><div class="ovhead"><b>${st==='check'?(ko?'나에게 필요한 것 찾기':'What do you need?'):t('login')}</b><button data-act="closeOv">${t('close')}</button></div><div class="scroll" style="padding-top:12px">${body}</div></div>`;
+ return `<div class="overlay loginov"><div class="ovhead"><b>${st==='check'?(ko?'나에게 필요한 것 찾기':'What do you need?'):t('login')}</b><button class="ovx" data-act="closeOv" aria-label="${t('close')}">${ICON.close}</button></div><div class="scroll">${body}</div></div>`;
 }
 function logoutOverlay(){
- return `<div class="overlay"><div class="ovhead"><b>${esc(S.profile.name)}</b><button data-act="closeOv">${t('close')}</button></div>
-  <div class="scroll" style="padding-top:12px"><div class="card"><span class="t">${tx(DEPTS[S.profile.dept])} · ${S.profile.year}-${S.profile.term} · ${natName(S.profile.nation,S.lang)}</span>
+ return `<div class="overlay ovc"><div class="ovhead"><b>${esc(S.profile.name)}</b><button class="ovx" data-act="closeOv" aria-label="${t('close')}">${ICON.close}</button></div>
+  <div class="scroll"><div class="card"><span class="t">${tx(DEPTS[S.profile.dept])} · ${S.profile.year}-${S.profile.term} · ${natName(S.profile.nation,S.lang)}</span>
   <button class="btn line" data-act="editProfile">${S.lang==='ko'?'프로필 수정':'Edit profile'}</button>
   <button class="btn ink" data-act="auth" data-v="out">${t('logout')}</button></div></div></div>`;
 }
