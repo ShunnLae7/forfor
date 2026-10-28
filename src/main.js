@@ -137,8 +137,7 @@ function renderMain(){
 function screen(){
  if (S.onboard) return onboarding();
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
-  <div class="headr"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select>
-  ${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : ''}</div></div>`;
+  <div class="headr">${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : ''}</div></div>`;
  let body;
  if (S.tab === 'home') body = `<div class="scroll">${home()}</div>`;
  else if (S.tab === 'study') body = `<div class="scroll">${study()}</div>`;
