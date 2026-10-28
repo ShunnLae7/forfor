@@ -159,10 +159,10 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 .task .ic.career{background:var(--money-soft);color:var(--money)}
 .task button.go{border:0;background:none;color:var(--accent);font-size:var(--fs-small);font-weight:600;padding:4px 0;text-align:left}
 .cal{display:flex;flex-direction:column}
-.cal li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
+.cal li{display:grid;grid-template-columns:7.5em 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
 .cal li:last-child{border-bottom:0}
 .cal li.now{font-weight:700;color:var(--accent)}
-.cal .d{font-family:var(--f-mono);font-size:var(--fs-small);color:var(--muted);font-variant-numeric:tabular-nums}
+.cal .d{white-space:nowrap;font-family:var(--f-mono);font-size:var(--fs-small);color:var(--muted);font-variant-numeric:tabular-nums}
 .cal ul{list-style:none;margin:0;padding:0}
 .lock{position:relative;overflow:hidden;min-height:200px}
 .lock .blur{filter:blur(4px);opacity:.55;pointer-events:none;display:flex;flex-direction:column;gap:6px}
