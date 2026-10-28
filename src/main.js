@@ -83,7 +83,7 @@ function onboarding(){
  return `<div class="onb"><div class="onb-top"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select></div>
   <div class="onb-mid"><div class="logo big"><i></i><span>${esc(S.appName)}</span></div>
    <p class="onb-line">${ko?'유학생이 모르는 걸 모르는 순간, 먼저 알려주는 학사 내비게이터':'Your academic navigator that tells you what you did not know to ask.'}</p></div>
-  <div class="onb-bot"><div class="field"><label for="onbNation">${ko?'어느 나라에서 왔나요?':'Where are you from?'}</label><select id="onbNation">${natOptions(S.profile.nation)}</select></div>
+  <div class="onb-bot">
    <button class="btn" data-act="onbStart">${ko?'시작하기':'Get started'}</button></div></div>`;
 }
 function renderRail(){
@@ -125,14 +125,13 @@ function renderMain(){
  document.body.classList.toggle('show-ai', S.showAI);
  document.body.classList.toggle('show-money', S.showMoney);
  const m = document.getElementById('main');
- if (S.mode === 'admin') { m.innerHTML = dashboard(); return; }
+ if (DEMO && S.mode === 'admin') { m.innerHTML = dashboard(); return; }
  m.innerHTML = `<div class="device-wrap"><div class="device"><div class="screen" id="screen">${screen()}</div></div></div>`;
  const ms = document.querySelector('.msgs'); if (ms) ms.scrollTop = ms.scrollHeight;
 }
 
 function screen(){
  if (S.onboard) return onboarding();
- const status = `<div class="statusbar"><span>9:41</span><span>${md(PHASES[S.phase].date)} · 5G</span></div>`;
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
   <div class="headr"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select>
   ${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : `<button class="loginpill" data-act="openLogin">${t('login')}</button>`}</div></div>`;
@@ -149,7 +148,7 @@ function screen(){
  else if (S.overlay === 'bill') ov = billOverlay();
  else if (S.overlay === 'compose') ov = composeOverlay();
  else if (S.overlay === 'logout') ov = logoutOverlay();
- return status + head + `<div style="flex:1;min-height:0;display:flex;flex-direction:column">${body}</div>` + bar + ov;
+ return head + `<div style="flex:1;min-height:0;display:flex;flex-direction:column">${body}</div>` + bar + ov;
 }
 
 function lockCard(preview){
@@ -546,7 +545,9 @@ function dashboard(){
 }
 
 /* ======================= RENDER & EVENTS ======================= */
-function render(){ renderRail(); renderMain(); }
+const DEMO = new URLSearchParams(location.search).get('demo') === '1';
+document.body.classList.toggle('demo', DEMO);
+function render(){ if (DEMO) renderRail(); renderMain(); }
 
 function runParse(){
  S.loginStep = 'gen'; S.genStep = 0; render();
@@ -573,7 +574,7 @@ document.addEventListener('click', e => {
  const b = e.target.closest('[data-act]'); if (!b) return;
  const a = b.dataset.act, v = b.dataset.v;
  if (['mode','auth','phase','step','persona'].includes(a)) S.onboard = false;
- if (a==='onbStart'){ S.profile.nation = document.getElementById('onbNation').value; S.onboard = false; render(); }
+ if (a==='onbStart'){ S.onboard = false; render(); }
  else if (a==='mode'){ S.mode=v; render(); }
  else if (a==='auth'){ S.loggedIn = v==='in'; S.overlay=null; render(); }
  else if (a==='phase'){ S.phase=v; render(); }
@@ -632,7 +633,6 @@ document.addEventListener('submit', e => {
 });
 document.addEventListener('change', e => {
  if (e.target.id==='langSel'){ S.lang = e.target.value; renderMain(); }
- else if (e.target.id==='onbNation'){ S.profile.nation = e.target.value; }
  else if (e.target.id==='tgAI'){ S.showAI = e.target.checked; renderMain(); }
  else if (e.target.id==='tgMoney'){ S.showMoney = e.target.checked; renderMain(); }
  else if (e.target.id==='pdfIn' && e.target.files && e.target.files[0]){ toast((S.lang==='ko'?'올린 파일: ':'File: ') + e.target.files[0].name + (S.lang==='ko'?' · 데모에서는 샘플 결과를 보여줘요':' · demo shows a sample result')); S.loginStep='check'; S.diagI=0; renderMain(); }
