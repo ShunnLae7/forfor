@@ -302,7 +302,8 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 .onb-bot{display:flex;flex-direction:column;gap:12px}
 
 /* Checklist carousel */
-.tcar{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;gap:0}
+.twrap{display:flex;flex-direction:column;gap:12px;flex-shrink:0;min-width:0}
+.tcar{flex-shrink:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;gap:0}
 .tcar::-webkit-scrollbar{display:none}
 .tcar>.slide{flex:0 0 100%;scroll-snap-align:start;min-width:0;padding:3px}
 .tdots{display:flex;justify-content:center;gap:6px}
