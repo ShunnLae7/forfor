@@ -1,5 +1,5 @@
 import './style.css'
-import { hooks, LANGS, STR, DEPTS, PERSONAS, DIAG, NATIONS, PHASES, PHASE_KEYS, BANNER_DUE, TASKS, CATLBL, CAL, REQ, POOLS, POSTS, PCATS, FAQ, WHERE, BILL_EXPL } from './data.js'
+import { hooks, LANGS, STR, DEPTS, PERSONAS, DIAG, NATIONS, NATION_CODES, NATIONS_TOP, natName, PHASES, PHASE_KEYS, BANNER_DUE, TASKS, CATLBL, CAL, REQ, POOLS, POSTS, PCATS, FAQ, WHERE, BILL_EXPL } from './data.js'
 
 /* 규칙 기반 시간표 생성: 우선순위 → 선호 → 시간 충돌 → 학점 상한 */
 function genPlan(){
@@ -25,7 +25,7 @@ function genPlan(){
 
 /* ======================= STATE ======================= */
 const S = {
- appName:'○○○', mode:'student', loggedIn:false, lang:'ko', phase:'arrive', tab:'home', overlay:null,
+ appName:'mumomo', onboard:true, mode:'student', loggedIn:false, lang:'ko', phase:'arrive', tab:'home', overlay:null,
  loginStep:'school', genStep:0,
  profile:{...PERSONAS.cont.p}, ans:{...PERSONAS.cont.ans}, persona:'cont', diagI:0,
  pref:{max:18,noNine:false,freeFri:false,eng:false}, alt:false, ttView:'plan', reg:{}, billCourse:'ds', qaView:'chat', pcat:'all', openTr:{}, openAns:{}, liked:{},
@@ -73,6 +73,19 @@ const STEPS = [
  {k:'qa',t:'Q&A',s:'근거 기반 AI 상담 · FAQ · 부서 안내'},
  {k:'dash',t:'국제처 화면',s:'B2B 구독 · 반복 질문 → FAQ 자동화'}
 ];
+const natOptions = sel => {
+ const rest = NATION_CODES.filter(c => !NATIONS_TOP.includes(c)).sort((a,b) => natName(a,S.lang).localeCompare(natName(b,S.lang),S.lang));
+ const opt = c => `<option value="${c}" ${sel===c?'selected':''}>${esc(natName(c,S.lang))}</option>`;
+ return `<optgroup label="${S.lang==='ko'?'자주 선택':'Common'}">${NATIONS_TOP.map(opt).join('')}</optgroup><optgroup label="${S.lang==='ko'?'전체 국가':'All countries'}">${rest.map(opt).join('')}</optgroup>`;
+};
+function onboarding(){
+ const ko = S.lang==='ko';
+ return `<div class="onb"><div class="onb-top"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select></div>
+  <div class="onb-mid"><div class="logo big"><i></i><span>${esc(S.appName)}</span></div>
+   <p class="onb-line">${ko?'유학생이 모르는 걸 모르는 순간, 먼저 알려주는 학사 내비게이터':'Your academic navigator that tells you what you did not know to ask.'}</p></div>
+  <div class="onb-bot"><div class="field"><label for="onbNation">${ko?'어느 나라에서 왔나요?':'Where are you from?'}</label><select id="onbNation">${natOptions(S.profile.nation)}</select></div>
+   <button class="btn" data-act="onbStart">${ko?'시작하기':'Get started'}</button></div></div>`;
+}
 function renderRail(){
  const r = document.getElementById('rail');
  r.innerHTML = `
@@ -118,6 +131,7 @@ function renderMain(){
 }
 
 function screen(){
+ if (S.onboard) return onboarding();
  const status = `<div class="statusbar"><span>9:41</span><span>${md(PHASES[S.phase].date)} · 5G</span></div>`;
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
   <div class="headr"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select>
@@ -457,7 +471,7 @@ function loginOverlay(){
     <div class="field full"><label for="pDept">${ko?'학과 · 학부':'Department'}</label><select id="pDept">${Object.entries(DEPTS).map(([k,v])=>`<option value="${k}" ${S.profile.dept===k?'selected':''}>${tx(v)}</option>`).join('')}</select></div>
     <div class="field"><label for="pYear">${ko?'입학 연도':'Entry year'}</label><select id="pYear">${['2023','2024','2025','2026'].map(y=>`<option ${S.profile.year===y?'selected':''}>${y}</option>`).join('')}</select></div>
     <div class="field"><label for="pTerm">${ko?'입학 학기':'Entry term'}</label><select id="pTerm"><option value="1" ${S.profile.term==='1'?'selected':''}>${ko?'1학기':'Spring'}</option><option value="2" ${S.profile.term==='2'?'selected':''}>${ko?'2학기':'Fall'}</option></select></div>
-    <div class="field full"><label for="pNation">${ko?'국적':'Nationality'}</label><select id="pNation">${Object.entries(NATIONS).map(([k,v])=>`<option value="${k}" ${S.profile.nation===k?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field full"><label for="pNation">${ko?'국적':'Nationality'}</label><select id="pNation">${natOptions(S.profile.nation)}</select></div>
    </div><button class="btn" type="submit">${ko?'다음':'Next'}</button></form>`;
  else if (st === 'upload') {
   const M = mode();
@@ -502,7 +516,7 @@ function loginOverlay(){
 }
 function logoutOverlay(){
  return `<div class="overlay"><div class="ovhead"><b>${esc(S.profile.name)}</b><button data-act="closeOv">${t('close')}</button></div>
-  <div class="scroll" style="padding-top:12px"><div class="card"><span class="t">${tx(DEPTS[S.profile.dept])} · ${S.profile.year}-${S.profile.term} · ${NATIONS[S.profile.nation]}</span>
+  <div class="scroll" style="padding-top:12px"><div class="card"><span class="t">${tx(DEPTS[S.profile.dept])} · ${S.profile.year}-${S.profile.term} · ${natName(S.profile.nation,S.lang)}</span>
   <button class="btn line" data-act="editProfile">${S.lang==='ko'?'프로필 수정':'Edit profile'}</button>
   <button class="btn ink" data-act="auth" data-v="out">${t('logout')}</button></div></div></div>`;
 }
@@ -558,11 +572,13 @@ function goStep(k){
 document.addEventListener('click', e => {
  const b = e.target.closest('[data-act]'); if (!b) return;
  const a = b.dataset.act, v = b.dataset.v;
- if (a==='mode'){ S.mode=v; render(); }
+ if (['mode','auth','phase','step','persona'].includes(a)) S.onboard = false;
+ if (a==='onbStart'){ S.profile.nation = document.getElementById('onbNation').value; S.onboard = false; render(); }
+ else if (a==='mode'){ S.mode=v; render(); }
  else if (a==='auth'){ S.loggedIn = v==='in'; S.overlay=null; render(); }
  else if (a==='phase'){ S.phase=v; render(); }
  else if (a==='step'){ goStep(v); }
- else if (a==='reset'){ Object.assign(S,{mode:'student',loggedIn:false,phase:'arrive',tab:'home',overlay:null,reg:{},chat:[],openTr:{},myPosts:[],points:120,alt:false,ttView:'plan',qaView:'chat',pcat:'all',step:1,persona:'cont',profile:{...PERSONAS.cont.p},ans:{...PERSONAS.cont.ans},pref:{max:18,noNine:false,freeFri:false,eng:false}}); render(); }
+ else if (a==='reset'){ Object.assign(S,{onboard:true,mode:'student',loggedIn:false,phase:'arrive',tab:'home',overlay:null,reg:{},chat:[],openTr:{},myPosts:[],points:120,alt:false,ttView:'plan',qaView:'chat',pcat:'all',step:1,persona:'cont',profile:{...PERSONAS.cont.p},ans:{...PERSONAS.cont.ans},pref:{max:18,noNine:false,freeFri:false,eng:false}}); render(); }
  else if (a==='tab'){ S.tab=v; S.overlay=null; renderMain(); }
  else if (a==='openLogin'){ S.overlay='login'; S.loginStep='school'; renderMain(); }
  else if (a==='logoutAsk'){ S.overlay='logout'; renderMain(); }
@@ -616,12 +632,13 @@ document.addEventListener('submit', e => {
 });
 document.addEventListener('change', e => {
  if (e.target.id==='langSel'){ S.lang = e.target.value; renderMain(); }
+ else if (e.target.id==='onbNation'){ S.profile.nation = e.target.value; }
  else if (e.target.id==='tgAI'){ S.showAI = e.target.checked; renderMain(); }
  else if (e.target.id==='tgMoney'){ S.showMoney = e.target.checked; renderMain(); }
  else if (e.target.id==='pdfIn' && e.target.files && e.target.files[0]){ toast((S.lang==='ko'?'올린 파일: ':'File: ') + e.target.files[0].name + (S.lang==='ko'?' · 데모에서는 샘플 결과를 보여줘요':' · demo shows a sample result')); S.loginStep='check'; S.diagI=0; renderMain(); }
 });
 document.addEventListener('input', e => {
- if (e.target.id==='appName'){ S.appName = e.target.value || '○○○'; renderMain(); }
+ if (e.target.id==='appName'){ S.appName = e.target.value || 'mumomo'; renderMain(); }
 });
 
 render();

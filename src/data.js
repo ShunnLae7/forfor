@@ -81,7 +81,11 @@ export const DIAG = [
  {k:'house',q:{ko:'자취하고 있나요?',en:'Do you live off campus?'},h:{ko:'주거 형태에 따라 해야 할 일이 달라져요.',en:'Your tasks depend on where you live.'},
   o:[['off',{ko:'네, 자취해요',en:'Yes, off campus'}],['dorm',{ko:'기숙사 / 가족과 살아요',en:'Dorm / with family'}],['searching',{ko:'집을 구하는 중이에요',en:'Looking for a place'}]]}
 ];
-export const NATIONS = {VN:'Việt Nam',CN:'中国',UZ:"O'zbekiston",KZ:'Қазақстан',MN:'Монгол',JP:'日本',US:'USA'};
+/* 국적: ISO 3166 국가 코드. 표시 이름은 Intl.DisplayNames로 앱 언어에 맞춰 만든다 */
+export const NATION_CODES = 'AF AL DZ AD AO AR AM AU AT AZ BH BD BY BE BT BO BA BW BR BN BG KH CM CA CL CN CO CR HR CU CY CZ DK DO EC EG SV EE ET FJ FI FR GE DE GH GR GT HN HK HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KW KG LA LV LB LY LT LU MO MY MV ML MT MX MD MN ME MA MM NP NL NZ NI NG KP NO OM PK PS PA PY PE PH PL PT QA RO RU SA SN RS SG SK SI SO ZA ES LK SD SE CH SY TW TJ TZ TH TL TN TR TM UG UA AE GB US UY UZ VE VN YE ZM ZW'.split(' ');
+export const NATIONS_TOP = ['VN','CN','UZ','KZ','MN','JP','US'];
+export const natName = (code, lang) => { try { return new Intl.DisplayNames([lang], {type:'region'}).of(code) || code } catch { return code } };
+export const NATIONS = Object.fromEntries(NATION_CODES.map(c => [c, natName(c, 'en')]));
 
 /* 데모 기준일: 시기를 바꾸면 홈이 바뀜 (일정은 모두 예시) */
 export const PHASES = {
