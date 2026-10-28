@@ -82,7 +82,7 @@ function onboarding(){
  const ko = S.lang==='ko';
  return `<div class="onb"><div class="onb-top"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select></div>
   <div class="onb-mid"><div class="logo big"><i></i><span>${esc(S.appName)}</span></div>
-   <p class="onb-line">${ko?'유학생이 모르는 걸 모르는 순간, 먼저 알려주는 학사 내비게이터':'Your academic navigator that tells you what you did not know to ask.'}</p></div>
+   <p class="onb-line">${t('intro')}</p></div>
   <div class="onb-bot">
    <button class="btn" data-act="onbStart">${ko?'시작하기':'Get started'}</button></div></div>`;
 }
@@ -138,7 +138,7 @@ function screen(){
  if (S.onboard) return onboarding();
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
   <div class="headr"><select class="langsel" id="langSel" aria-label="Language">${LANGS.map(([k,n])=>`<option value="${k}" ${S.lang===k?'selected':''}>${n}</option>`).join('')}</select>
-  ${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : `<button class="loginpill" data-act="openLogin">${t('login')}</button>`}</div></div>`;
+  ${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : ''}</div></div>`;
  let body;
  if (S.tab === 'home') body = `<div class="scroll">${home()}</div>`;
  else if (S.tab === 'study') body = `<div class="scroll">${study()}</div>`;
@@ -483,9 +483,9 @@ function loginOverlay(){
  let body = '';
  if (st === 'school') body = `<div class="card" style="gap:12px"><span class="t">${ko?'1분이면 시작할 수 있어요':'Start in a minute'}</span>
    <button class="gbtn" data-act="google"><b>G</b>${ko?'Google 계정으로 계속하기':'Continue with Google'}</button>
-   <button class="gbtn" data-act="lstep" data-v="profile">${ko?'학교 이메일로 계속하기':'Continue with school email'}</button>
+   <button class="gbtn pri" data-act="lstep" data-v="profile">${ko?'학교 이메일로 계속하기':'Continue with school email'}</button>
    <span class="s">${ko?'학교 메일이 아직 없어도 Google 계정으로 가입할 수 있어요. 학번은 다음 단계에서 입력해요.':'No school email yet? Use Google. You enter your student ID next.'}</span>
-   <button class="btn sm ink" style="align-self:flex-start" data-act="closeOv">${ko?'로그인 없이 둘러보기':'Browse as guest'}</button></div>`;
+   <button class="textbtn" data-act="closeOv">${ko?'로그인 없이 둘러보기':'Browse as guest'}</button></div>`;
  else if (st === 'profile') body = `<form class="card" id="profForm"><span class="t">${ko?'학과와 학번부터 알려 주세요':'Your department and student ID'}</span>
    <span class="s">${ko?'학과·입학 학기에 따라 과목이수표가 필요한지 정해져요.':'This decides whether we need your course record.'}</span>
    <div class="form2">
@@ -535,7 +535,7 @@ function loginOverlay(){
   body = `<div class="card"><span class="t">${ko?'내 체크리스트를 만들고 있어요':'Building your checklist'}</span><ol class="gen">
    ${steps.map((x,i)=>`<li class="${S.genStep>i?'done':''}">${x}</li>`).join('')}</ol></div>`;
  }
- return `<div class="overlay"><div class="ovhead"><b>${st==='check'?(ko?'나에게 필요한 것 찾기':'What do you need?'):t('login')}</b><button data-act="closeOv">${t('close')}</button></div><div class="scroll" style="padding-top:12px">${body}</div></div>`;
+ return `<div class="overlay loginov"><div class="ovhead"><b>${st==='check'?(ko?'나에게 필요한 것 찾기':'What do you need?'):t('login')}</b><button data-act="closeOv">${t('close')}</button></div><div class="scroll" style="padding-top:12px">${body}</div></div>`;
 }
 function logoutOverlay(){
  return `<div class="overlay"><div class="ovhead"><b>${esc(S.profile.name)}</b><button data-act="closeOv">${t('close')}</button></div>
