@@ -343,3 +343,39 @@ export const BILL_EXPL = {
  ru:'Это письмо вежливо просит профессора подписать разрешение на запись на курс. Корейским профессорам лучше писать в таком порядке: приветствие → факультет, курс и номер студента → почему вам нужен этот курс → чёткая просьба → благодарность. Отправляйте со студенческой почты.'
 };
 
+
+/* 알림: 문구는 ko/en으로 관리하고 다른 언어는 en으로 fallback */
+const NL = {...CATLBL, comm:{ko:'커뮤니티',en:'Community'}};
+export const NOTI_UI = {
+ ko:{title:'알림', profile:'내 프로필', newN:n=>`새 알림 ${n}개`, readAll:'모두 읽음', empty:'새 알림이 없어요', aria:n=>`알림 ${n}개`, now:'방금'},
+ en:{title:'Notifications', profile:'My profile', newN:n=>`${n} new`, readAll:'Mark all read', empty:'No new notifications', aria:n=>`${n} notifications`, now:'Just now'}
+};
+export const NOTI_INIT = [
+ {id:'init-cart', ic:NL.study, t:{ko:'장바구니 마감이 3일 남았어요',en:'Pre-registration cart closes in 3 days'}, d:{ko:'수강신청 전에 담아 두면 신청이 빨라져요.',en:'Fill it before registration to move faster.'}, when:{ko:'1시간 전',en:'1h ago'}, go:'tt', unread:true},
+ {id:'init-arc', ic:NL.visa, t:{ko:'외국인등록 예약을 잡으세요 D-81',en:'Book your alien registration visit, D-81'}, d:{ko:'하이코리아 예약은 몇 주씩 밀릴 수 있어요.',en:'HiKorea slots can be weeks out.'}, when:{ko:'3시간 전',en:'3h ago'}, go:'home', unread:true},
+ {id:'init-ds', ic:NL.study, t:{ko:'이산구조를 이번 학기에 들으세요',en:'Take Discrete Structures this term'}, d:{ko:'알고리즘의 선수과목이에요.',en:'It is a prerequisite for Algorithms.'}, when:{ko:'어제',en:'Yesterday'}, go:'study', unread:true},
+ {id:'init-ans', ic:NL.comm, t:{ko:'내 질문에 선배 답변이 달렸어요',en:'A senior answered your question'}, d:{ko:'커뮤니티에서 답변을 확인해 보세요.',en:'Check the answer in Community.'}, when:{ko:'2일 전',en:'2d ago'}, go:'comm', unread:false}
+];
+/* 시기를 바꾸면 그 시기의 할 일에 맞춰 순서대로 도착하는 알림 (when은 도착 시 '방금') */
+export const NOTI_PHASE = {
+ arrive:[
+  {id:'arrive-cart', ic:NL.study, t:{ko:'장바구니에 담을 과목을 확인하세요',en:'Check the courses for your cart'}, d:{ko:'수강신청 전에 담아 두면 빨라요.',en:'Adding them early saves time.'}, go:'tt'},
+  {id:'arrive-usim', ic:NL.life, t:{ko:'유심 개통을 아직 안 했어요',en:'You have not set up a SIM yet'}, d:{ko:'여권만 있으면 선불 유심을 개통할 수 있어요.',en:'A passport is enough for a prepaid SIM.'}, go:'home'},
+  {id:'arrive-req', ic:NL.study, t:{ko:'남은 필수 과목을 확인하세요',en:'Review your remaining required courses'}, d:{ko:'이번 학기에 들을 과목을 정리했어요.',en:'We listed what to take this term.'}, go:'study'}],
+ reg:[
+  {id:'reg-open', ic:NL.study, t:{ko:'오늘 수강신청이 열려요',en:'Course registration opens today'}, d:{ko:'신청 시작 시간과 순서를 확인하세요.',en:'Check the start time and your order.'}, go:'tt'},
+  {id:'reg-order', ic:NL.study, t:{ko:'신청 순서를 정해 두세요',en:'Set your registration order'}, d:{ko:'정원이 작은 과목부터 담으면 좋아요.',en:'Start with the smallest sections.'}, go:'tt'},
+  {id:'reg-arc', ic:NL.visa, t:{ko:'외국인등록 기한을 확인하세요',en:'Check your alien registration deadline'}, d:{ko:'입국 후 90일 안에 해야 해요.',en:'It must be done within 90 days of arrival.'}, go:'home'}],
+ add:[
+  {id:'add-close', ic:NL.study, t:{ko:'수강정정 마감이 다가와요',en:'Add/drop is closing soon'}, d:{ko:'바꿀 과목이 있으면 서두르세요.',en:'Hurry if you want to change courses.'}, go:'tt'},
+  {id:'add-bill', ic:NL.study, t:{ko:'못 잡은 과목은 빌넣 모드로 신청하세요',en:'Missed a course? Use add-request mode'}, d:{ko:'메일 초안을 만들어 드려요.',en:'We draft the email for you.'}, go:'tt'},
+  {id:'add-nhis', ic:NL.life, t:{ko:'건강보험 가입 상태를 확인하세요',en:'Check your health insurance status'}, d:{ko:'가입 대상이면 바로 신청하세요.',en:'Apply right away if you are eligible.'}, go:'home'}],
+ mid:[
+  {id:'mid-scholar', ic:NL.study, t:{ko:'장학금 신청 마감이 다가와요',en:'Scholarship deadline is near'}, d:{ko:'직전 학기 성적으로 신청할 수 있는지 확인했어요.',en:'We checked your eligibility.'}, go:'home'},
+  {id:'mid-excused', ic:NL.study, t:{ko:'유고결석 절차를 미리 알아 두세요',en:'Learn the excused-absence process'}, d:{ko:'아프기 전에 서류를 확인해 두세요.',en:'Know the paperwork before you need it.'}, go:'qa'},
+  {id:'mid-nhis', ic:NL.life, t:{ko:'건강보험료 납부 안내가 있어요',en:'Health insurance bill notice'}, d:{ko:'납부 기한을 확인하세요.',en:'Check the payment due date.'}, go:'home'}],
+ end:[
+  {id:'end-visa', ic:NL.visa, t:{ko:'체류기간 연장 시기예요',en:'Time to extend your stay'}, d:{ko:'재학·성적증명서부터 발급받으세요.',en:'Get your certificates first.'}, go:'home'},
+  {id:'end-cert', ic:NL.study, t:{ko:'증명서를 발급받으세요',en:'Get your certificates'}, d:{ko:'재학증명서와 성적증명서가 필요해요.',en:'You need enrollment and transcript certificates.'}, go:'home'},
+  {id:'end-next', ic:NL.career, t:{ko:'다음 학기 계획을 세워 보세요',en:'Plan your next term'}, d:{ko:'남은 필수 과목을 확인하세요.',en:'Review remaining required courses.'}, go:'study'}]
+};

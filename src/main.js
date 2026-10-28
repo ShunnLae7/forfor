@@ -1,5 +1,5 @@
 import './style.css'
-import { hooks, LANGS, STR, DEPTS, PERSONAS, DIAG, NATIONS, NATION_CODES, NATIONS_TOP, natName, PHASES, PHASE_KEYS, BANNER_DUE, TASKS, CATLBL, CAL, REQ, POOLS, POSTS, PCATS, FAQ, WHERE, BILL_EXPL } from './data.js'
+import { hooks, LANGS, STR, DEPTS, PERSONAS, DIAG, NATIONS, NATION_CODES, NATIONS_TOP, natName, PHASES, PHASE_KEYS, BANNER_DUE, TASKS, CATLBL, CAL, REQ, POOLS, POSTS, PCATS, FAQ, WHERE, BILL_EXPL, NOTI_UI, NOTI_INIT, NOTI_PHASE } from './data.js'
 
 /* 규칙 기반 시간표 생성: 우선순위 → 선호 → 시간 충돌 → 학점 상한 */
 function genPlan(){
@@ -29,6 +29,7 @@ const S = {
  loginStep:'school', genStep:0,
  profile:{...PERSONAS.cont.p}, ans:{...PERSONAS.cont.ans}, persona:'cont', diagI:0,
  pref:{max:18,noNine:false,freeFri:false,eng:false}, alt:false, ttView:'plan', reg:{}, billCourse:'ds', qaView:'chat', pcat:'all', openTr:{}, openAns:{}, liked:{},
+ notis:[], notiSeeded:false, notiShown:null,
  taskI:0, chat:[], points:120, myPosts:[], showAI:false, showMoney:false, step:1
 };
 
@@ -121,7 +122,58 @@ function renderRail(){
 }
 
 /* ======================= APP SCREENS ======================= */
+/* ======================= 알림 ======================= */
+const nt = k => (NOTI_UI[S.lang] && NOTI_UI[S.lang][k] !== undefined) ? NOTI_UI[S.lang][k] : NOTI_UI.en[k];
+const unreadN = () => S.notis.filter(n => n.unread).length;
+let notiTimers = [];
+const clearNotiTimers = () => { notiTimers.forEach(clearTimeout); notiTimers = []; };
+/* 비로그인이면 알림을 비우고, 로그인하면 데모 알림을 한 번 채운다 */
+function syncNotis(){
+ if (!S.loggedIn){
+  S.notis = []; S.notiSeeded = false; S.notiShown = null; clearNotiTimers();
+  if (S.overlay === 'noti') S.overlay = null;
+ } else if (!S.notiSeeded){
+  S.notis = NOTI_INIT.map(n => ({...n})); S.notiSeeded = true;
+ }
+}
+const badgeHtml = pop => { const n = unreadN(); return n ? `<span class="nbadge${pop?' pop':''}" aria-hidden="true">${n > 9 ? '9+' : n}</span>` : ''; };
+function avatarBtn(){
+ const n = unreadN(), pop = S.notiShown !== null && n !== S.notiShown; S.notiShown = n;
+ return `<button class="avatar" id="avatarBtn" data-act="notiOpen" aria-label="${nt('aria')(n)}">${esc(S.profile.name.slice(0,1))}${badgeHtml(pop)}</button>`;
+}
+/* 도착·읽음 때 화면 전체를 다시 그리지 않고 배지와 열린 목록만 갱신 */
+function refreshNoti(){
+ const av = document.getElementById('avatarBtn');
+ if (av){
+  const n = unreadN(), pop = n !== S.notiShown; S.notiShown = n;
+  av.setAttribute('aria-label', nt('aria')(n));
+  const old = av.querySelector('.nbadge'); if (old) old.remove();
+  av.insertAdjacentHTML('beforeend', badgeHtml(pop));
+ }
+ const ov = document.getElementById('notiov'); if (ov) ov.outerHTML = notiOverlay();
+}
+function pushNoti(n){
+ if (!S.loggedIn || S.notis.some(x => x.id === n.id)) return;
+ S.notis.unshift({...n, when:{ko:NOTI_UI.ko.now,en:NOTI_UI.en.now}, unread:true});
+ refreshNoti();
+}
+/* 시연용: 시기에 맞는 알림을 1초 간격으로 하나씩 */
+function queuePhaseNotis(phase){
+ clearNotiTimers();
+ (NOTI_PHASE[phase] || []).forEach((n, i) => notiTimers.push(setTimeout(() => pushNoti(n), (i + 1) * 1000)));
+}
+function notiOverlay(){
+ const n = unreadN();
+ const cards = S.notis.map(x => `<button class="noti-card${x.unread?' unread':''}" data-act="notiGo" data-v="${esc(x.id)}">
+   <span class="noti-top"><span class="noti-ic">${tx(x.ic)}</span><span class="noti-when">${tx(x.when)}</span></span>
+   <span class="noti-t">${tx(x.t)}</span><span class="noti-d">${tx(x.d)}</span>${x.unread?'<i class="noti-dot" aria-hidden="true"></i>':''}</button>`).join('');
+ return `<div class="overlay" id="notiov" role="dialog" aria-label="${nt('title')}"><div class="ovhead"><b>${nt('title')}</b><button data-act="closeOv">${t('close')}</button></div>
+  <div class="scroll noti-list"><button class="btn line noti-prof" data-act="logoutAsk">${nt('profile')}</button>
+  ${S.notis.length ? `<div class="noti-sum"><b>${nt('newN')(n)}</b><button data-act="notiAll" ${n?'':'disabled'}>${nt('readAll')}</button></div>${cards}` : `<div class="noti-empty">${nt('empty')}</div>`}</div></div>`;
+}
+
 function renderMain(){
+ syncNotis();
  document.body.classList.toggle('show-ai', S.showAI);
  document.body.classList.toggle('show-money', S.showMoney);
  const m = document.getElementById('main');
@@ -137,7 +189,7 @@ function renderMain(){
 function screen(){
  if (S.onboard) return onboarding();
  const head = `<div class="apphead"><div class="logo"><i></i><span>${esc(S.appName)}</span></div>
-  <div class="headr">${S.loggedIn ? `<button class="avatar" data-act="logoutAsk" aria-label="${t('logout')}">${esc(S.profile.name.slice(0,1))}</button>` : ''}</div></div>`;
+  <div class="headr">${S.loggedIn ? avatarBtn() : ''}</div></div>`;
  let body;
  if (S.tab === 'home') body = `<div class="scroll">${home()}</div>`;
  else if (S.tab === 'study') body = `<div class="scroll">${study()}</div>`;
@@ -151,6 +203,7 @@ function screen(){
  else if (S.overlay === 'bill') ov = billOverlay();
  else if (S.overlay === 'compose') ov = composeOverlay();
  else if (S.overlay === 'logout') ov = logoutOverlay();
+ else if (S.overlay === 'noti') ov = notiOverlay();
  return head + `<div style="flex:1;min-height:0;display:flex;flex-direction:column">${body}</div>` + bar + ov;
 }
 
@@ -601,11 +654,14 @@ document.addEventListener('click', e => {
  else if (a==='taskDot'){ const tc = document.getElementById('tcar'); if (tc) tc.scrollTo({left: +v * tc.clientWidth, behavior:'smooth'}); }
  else if (a==='mode'){ S.mode=v; render(); }
  else if (a==='auth'){ S.loggedIn = v==='in'; S.taskI = 0; S.overlay=null; render(); }
- else if (a==='phase'){ S.phase=v; render(); }
+ else if (a==='phase'){ S.phase=v; render(); if (S.loggedIn) queuePhaseNotis(v); }
  else if (a==='step'){ goStep(v); }
  else if (a==='reset'){ Object.assign(S,{onboard:true,mode:'student',loggedIn:false,phase:'arrive',tab:'home',overlay:null,reg:{},chat:[],openTr:{},myPosts:[],points:120,alt:false,ttView:'plan',qaView:'chat',pcat:'all',step:1,persona:'cont',profile:{...PERSONAS.cont.p},ans:{...PERSONAS.cont.ans},pref:{max:18,noNine:false,freeFri:false,eng:false}}); render(); }
  else if (a==='tab'){ S.tab=v; S.overlay=null; renderMain(); }
  else if (a==='openLogin'){ S.overlay='login'; S.loginStep='school'; renderMain(); }
+ else if (a==='notiOpen'){ S.overlay='noti'; renderMain(); }
+ else if (a==='notiAll'){ S.notis.forEach(n => n.unread = false); refreshNoti(); }
+ else if (a==='notiGo'){ const n = S.notis.find(x => x.id === v); if (n){ n.unread = false; S.tab = n.go; } S.overlay = null; renderMain(); }
  else if (a==='logoutAsk'){ S.overlay='logout'; renderMain(); }
  else if (a==='editProfile'){ S.overlay='login'; S.loginStep='profile'; renderMain(); }
  else if (a==='closeOv'){ S.overlay=null; renderMain(); }
