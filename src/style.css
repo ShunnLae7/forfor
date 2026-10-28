@@ -283,3 +283,12 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 .prefs button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:10px;font-size:13px;z-index:50;max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* 온보딩 */
+.onb{flex:1;display:flex;flex-direction:column;padding:18px 20px 24px;background:var(--panel)}
+.onb-top{display:flex;justify-content:flex-end}
+.onb-mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.logo.big{font-size:34px}
+.logo.big i{width:20px;height:20px;border-radius:4px}
+.onb-line{margin:0;font-size:17px;font-weight:600;line-height:1.45;word-break:keep-all}
+.onb-bot{display:flex;flex-direction:column;gap:12px}
