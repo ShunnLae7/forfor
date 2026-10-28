@@ -30,7 +30,7 @@
 
 *{box-sizing:border-box;scrollbar-width:none;-ms-overflow-style:none}
 *::-webkit-scrollbar{display:none}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--fs-body);word-break:keep-all;overflow-wrap:anywhere;line-height:1.5;
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--fs-body);word-break:keep-all;overflow-wrap:anywhere;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px}
 body.demo{padding-block:24px}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -94,10 +94,10 @@ body.demo .device{width:392px;max-width:100%;height:min(840px,calc(100vh - 48px)
   body:not(.demo) .screen{border-radius:0}
 }
 .apphead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 16px 10px}
-.logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:18px;letter-spacing:-.01em;min-width:0}
+.logo{display:flex;align-items:center;gap:7px;font-weight:700;font-size:18px;letter-spacing:-.01em;min-width:0; }
 .logo i{width:12px;height:12px;background:var(--accent);transform:rotate(45deg);border-radius:2px;flex:none}
 .logo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.headr{display:flex;align-items:center;gap:6px;flex:none}
+.headr{display:flex;align-items:center;gap:5px;flex:none}
 .langsel{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:4px 6px;font-size:var(--fs-small);max-width:96px}
 .avatar{width:32px;height:32px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:var(--fs-sm);display:grid;place-content:center}
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:2px 16px 22px;display:flex;flex-direction:column;gap:12px}
@@ -286,7 +286,7 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 .opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:13px 14px;font-size:var(--fs-sm)}
 .opt::before{content:"";width:16px;height:16px;border-radius:50%;border:1.5px solid var(--gray);flex:none}
 .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
-.opt[aria-pressed="true"]::before{border:5px solid var(--accent)}
+.opt[aria-pressed="true"]::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--panel)}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px;font-weight:600}
 .gbtn b{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-content:center;font-size:var(--fs-small)}
 .guide-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
@@ -336,12 +336,26 @@ body.show-money .spot[data-money]::before{content:"₩ " attr(data-money);positi
 /* 로그인 */
 .loginov{background:var(--accent-soft)}
 .loginov .ovhead{background:var(--accent);color:var(--accent-ink);border-bottom:0}
-.loginov .ovhead button{background:rgba(255,255,255,.22);color:#fff}
-.loginov .card{background:#fff;color:#1D1C1E;border-color:transparent;box-shadow:0 6px 18px -10px rgba(146,13,20,.35)}
-.loginov .card .s{color:#636266}
-.loginov .gbtn{background:#fff;color:#1D1C1E;border:1px solid var(--line);font-size:var(--fs-btn)}
+.loginov .ovhead button{background:color-mix(in srgb,currentColor 18%,transparent);color:inherit}
+.loginov .card{background:var(--panel);color:var(--ink);border-color:transparent;box-shadow:0 6px 18px -10px rgba(146,13,20,.35)}
+.loginov .gbtn{background:var(--panel);color:var(--ink);border:1px solid var(--line);font-size:var(--fs-btn)}
 .loginov .gbtn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.textbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:var(--fs-btn);padding:8px;align-self:center;text-decoration:underline;text-underline-offset:3px}
+.textbtn{border:0;background:none;color:var(--muted);font-weight:600;font-size:var(--fs-small);min-height:44px;padding:0 12px;align-self:center}
+
+/* 오버레이 헤더: 아이콘 닫기 버튼 */
+.ovhead .ovx{flex:none;width:40px;height:40px;padding:0;border-radius:10%;display:grid;place-content:center}
+.ovhead .ovx svg{width:18px;height:18px}
+
+/* 로그인 헤더: 직사각형 빨간 바 */
+.loginov .ovhead{padding:22px 20px 22px}
+.loginov .ovhead b{font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.loginov .card{border-radius:20px;padding:20px;gap:12px}
+.loginov .gbtn{min-height:52px}
+.gbtn svg{width:20px;height:20px;flex:none}
+
+/* 짧은 시트(로그인·프로필)는 남은 공간의 세로 가운데에. margin:auto라 내용이 길면 그냥 위에서부터 스크롤 */
+.loginov .scroll>*,.ovc .scroll>*{margin-block:auto}
+.loginov .scroll,.ovc .scroll{padding-block:20px}
 
 /* ===== 알림 배지 · 목록 ===== */
 .avatar{position:relative;cursor:pointer}
